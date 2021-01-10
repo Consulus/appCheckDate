@@ -1,20 +1,31 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TextInput } from "react-native";
-import moment from "moment";
 
 export default function App() {
-  const dateNow = new Date().getTime();
+  const [day, setDay] = useState(1);
+  const [month, setMonth] = useState(0);
+  const [year, setYear] = useState(2021);
 
-  const [day, setDay] = useState();
-  const [month, setMonth] = useState();
-  const [year, setYear] = useState();
+  const [dayLive, setDayLive] = useState(20);
 
-  const dateBorn = new Date({ day }, { month }, { year });
+  const dateNow =
+    new Date(`${year}, ${month}, ${day}`) == "Invalid Date"
+      ? 0
+      : new Date(year, month, day).getTime();
+  console.log(dateNow);
+  let result =
+    (new Date().getTime() - (dateNow + dayLive * 24 * 60 * 60 * 1000)) /
+    (24 * 60 * 60 * 1000);
 
-  function handleInputChange(e) {
-    setState(e.value);
+  let input = "";
+
+  if (result > 0) {
+    input = `Товар просрочен уже ${Math.floor(
+      result * 24
+    )} час (${result.toFixed(2)} день)`;
+  } else {
+    input = `До окончания срока осталось ${Math.floor(Math.abs(result))} дня`;
   }
-  console.log(moment([year, month, day]).fromNow(true));
 
   return (
     <View style={styles.container}>
@@ -34,8 +45,11 @@ export default function App() {
         />
       </View>
       <Text>Введите срок годности (в сутках):</Text>
-      <TextInput style={styles.input} />
-      <Text>До окончания срока осталось {dateNow}</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(value) => setDayLive(+value)}
+      />
+      <Text>{input}</Text>
     </View>
   );
 }
